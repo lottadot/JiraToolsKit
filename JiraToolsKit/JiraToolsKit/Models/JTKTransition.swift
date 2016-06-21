@@ -11,8 +11,8 @@ import Foundation
 /// The `JTKTransition` class represents a JIRA API Transition.
 public class JTKTransition {
     
-    var transitionId: String = "0"
-    public var name: String = ""
+    var transitionId: String
+    public var name: String
     
     var status: JTKStatus?
     var statusCategory: JTKStatusCategory?

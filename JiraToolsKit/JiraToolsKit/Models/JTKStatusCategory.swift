@@ -11,10 +11,10 @@ import Foundation
 /// The `JTKStatusCategory` class represents a JIRA API StatusCategory.
 public class JTKStatusCategory {
 
-    var url: String = ""
+    var url: String
     var categoryId: UInt = 0
-    var key: String = ""
-    var name: String = ""
+    var key: String
+    var name: String
     
     init(categoryId: UInt, url: String, key: String, name: String) {
         self.categoryId = categoryId

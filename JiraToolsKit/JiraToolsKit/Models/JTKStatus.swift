@@ -11,9 +11,9 @@ import Foundation
 /// The `JTKStatus` class represents a JIRA API Status.
 public class JTKStatus {
 
-    var url: String = ""
-    var name: String = ""
-    var statusId: String = "0"
+    var url: String
+    var name: String
+    var statusId: String
     
     var statusCategory: JTKStatusCategory?
     

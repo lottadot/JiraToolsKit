@@ -11,10 +11,10 @@ import Foundation
 /// The `JTKIssue` class represents a JIRA API Issue.
 public class JTKIssue {
     
-    var issueId: String? = ""   // "10002"
-    var url: String = ""        // "http://www.example.com/jira/rest/api/2/issue/10002"
-    var key: String = ""        // "EX-1"
-    var longDescription: String = "" // "example bug report"
+    var issueId: String?        // "10002"
+    var url: String             // "http://www.example.com/jira/rest/api/2/issue/10002"
+    var key: String             // "EX-1"
+    var longDescription: String // "example bug report"
     
     var status: JTKStatus?
     
