@@ -61,7 +61,7 @@ public class JTKAPIClient {
                 return
             }
             
-            let apiResult = JTKAPIClientResult.init(success: nil != strongOp.issue, error: strongOp.error, data: strongOp.issue)
+            let apiResult = JTKAPIClientResult(success: nil != strongOp.issue, error: strongOp.error, data: strongOp.issue)
             completion(result: apiResult)
         }
         
@@ -85,7 +85,7 @@ public class JTKAPIClient {
                 return
             }
             
-            let apiResult = JTKAPIClientResult.init(success: (nil == strongOp.error), error: strongOp.error, data: strongOp.transitions)
+            let apiResult = JTKAPIClientResult(success: (nil == strongOp.error), error: strongOp.error, data: strongOp.transitions)
             completion(result: apiResult)
         }
         
@@ -106,7 +106,7 @@ public class JTKAPIClient {
                 return
             }
             
-            let apiResult = JTKAPIClientResult.init(success: nil == strongOp.error, error: strongOp.error, data: nil)
+            let apiResult = JTKAPIClientResult(success: nil == strongOp.error, error: strongOp.error, data: nil)
             completion(result: apiResult)
         }
         
@@ -127,7 +127,7 @@ public class JTKAPIClient {
                 return
             }
             
-            let apiResult = JTKAPIClientResult.init(success: nil == strongOp.error, error: strongOp.error, data: nil)
+            let apiResult = JTKAPIClientResult(success: nil == strongOp.error, error: strongOp.error, data: nil)
             completion(result: apiResult)
         }
         
