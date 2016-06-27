@@ -152,8 +152,8 @@ class JiraToolsKitTests: XCTestCase {
                 XCTAssertNotNil(issue, "Issue Received from Service is Nil")
                 XCTAssertNotNil(issue.status, "Issue Status is Nil and should not be")
                 
-                XCTAssertTrue(issue.status?.name.lowercaseString == "In Progress".lowercaseString,
-                              "Issue is not In Progress, status:\(issue.status?.description)")
+                XCTAssertTrue(issue.status?.name.lowercaseString == "In Progress".lowercaseString || issue.status?.name.lowercaseString == "Actioned".lowercaseString,
+                              "Issue is not In Progress or Actioned, status:\(issue.status?.description)")
 
                 self.apiClient.getIssueTransitions(issue, completion: { (transitionResult) in
                     
