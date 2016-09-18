@@ -9,10 +9,10 @@
 import Foundation
 
 /// A Network Operation to Get a JIRA Issue's Transitions (from Workflows)
-public class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
+open class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
     
-    public var transitions: [JTKTransition] = []
-    private var issueIdOrKey: String?
+    open var transitions: [JTKTransition] = []
+    fileprivate var issueIdOrKey: String?
     
     convenience public init(dataProvider: JTKAPIClientOperatonDataProvider, issueIdOrKey: String) {
         self.init(url: dataProvider.clientEndPoint())
@@ -20,16 +20,16 @@ public class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
         self.issueIdOrKey = issueIdOrKey
     }
     
-    public override func start() {
-        queuePriority = .Normal
+    open override func start() {
+        queuePriority = .normal
         
-        if cancelled {
-            finished = true
+        if isCancelled {
+            isFinished = true
             return
         }
         
         // /rest/api/2/issue/{issueIdOrKey}/transitions
-        guard let issueId = issueIdOrKey, let requestURL = NSURL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/transitions") else {
+        guard let issueId = issueIdOrKey, let requestURL = URL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/transitions") else {
             
             self.error = JTKAPIClientNetworkError.createError(1001, statusCode: 1001, failureReason: "Cannot build Request URL")
             self.cancel()
@@ -37,22 +37,21 @@ public class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
             return
         }
         
-        let urlRequest = NSMutableURLRequest(URL: requestURL)
-        urlRequest.HTTPMethod = "GET"
+        var urlRequest = URLRequest(url: requestURL)
+        urlRequest.httpMethod = "GET"
 
-        let task = self.urlSession.dataTaskWithRequest(urlRequest)
+        let task = urlSession.dataTask(with: urlRequest)
         task.resume()
     }
     
     override func handleResponse() {
         do {
             
-            if cancelled {
+            if isCancelled {
                 return
             }
             
-            guard let rawdata:NSData = self.receivedData,
-                let json:[String : AnyObject] = try NSJSONSerialization.JSONObjectWithData(rawdata, options: NSJSONReadingOptions.MutableContainers) as? [String : AnyObject] else {
+            guard let json:[String : AnyObject] = try JSONSerialization.jsonObject(with: receivedData as Data, options: JSONSerialization.ReadingOptions.mutableContainers) as? [String : AnyObject] else {
                     
                     self.error = JTKAPIClientNetworkError.createError(1002, statusCode: 1002, failureReason: "Could not convert JSON")
                     self.cancel()
@@ -63,7 +62,7 @@ public class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
             guard let serviceTransitions = json["transitions"] as? [[String: AnyObject]] else {
                 self.error = JTKAPIClientNetworkError.createError(1003, statusCode: 1003, failureReason: "Could not convert Issue JSON")
                 self.cancel()
-                finished = true
+                isFinished = true
 
                 return
             }
@@ -74,7 +73,7 @@ public class JTKAPIClientFetchIssueTransitions: JTKAPIClientOperation {
                 }
             }
             
-            finished = true
+            isFinished = true
             return
         }
         catch (_) {

@@ -9,7 +9,7 @@
 import Foundation
 
 /// The `JTKStatus` class represents a JIRA API Status.
-public class JTKStatus {
+open class JTKStatus {
 
     var url: String
     var name: String
@@ -28,7 +28,7 @@ public class JTKStatus {
         self.statusCategory = statusCategory
     }
 
-    public static func withDictionary(dictionary: [String : AnyObject]) -> JTKStatus? {
+    open static func withDictionary(_ dictionary: [String : AnyObject]) -> JTKStatus? {
         
         guard let fakeId = dictionary["id"] as? String,
             let fakeUrl = dictionary["self"] as? String,
@@ -53,11 +53,11 @@ public class JTKStatus {
         return JTKStatus.init(statusId: fakeId, url: fakeUrl, name: name, statusCategory: statusCategory)
     }
     
-    public var description:String {
+    open var description:String {
         return "Status id:\(statusId) url:\(url) name:\(name) categoryName:\(statusCategory?.name)"
     }
     
-    public var debugDescription:String {
+    open var debugDescription:String {
         return "Status id:\(statusId) url:\(url) name:\(name) category:\(statusCategory?.description)"
     }
 }

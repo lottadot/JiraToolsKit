@@ -9,10 +9,10 @@
 import Foundation
 
 /// The `JTKTransition` class represents a JIRA API Transition.
-public class JTKTransition {
+open class JTKTransition {
     
     var transitionId: String
-    public var name: String
+    open var name: String
     
     var status: JTKStatus?
     var statusCategory: JTKStatusCategory?
@@ -28,7 +28,7 @@ public class JTKTransition {
         self.statusCategory = statusCategory
     }
     
-    public static func withDictionary(dictionary: [String : AnyObject]) -> JTKTransition? {
+    open static func withDictionary(_ dictionary: [String : AnyObject]) -> JTKTransition? {
         
         guard
             // The Transition is a Status and a StatusCategory
@@ -55,11 +55,11 @@ public class JTKTransition {
         return JTKTransition.init(transitionId: fakeId, name: name, status: status, statusCategory: statusCategory)
      }
     
-    public var description:String {
+    open var description:String {
         return "Transition id:\(transitionId) name:\(name) status:\(status?.name) category:\(statusCategory?.name)"
     }
     
-    public var debugDescription:String {
+    open var debugDescription:String {
         return "Transition id:\(transitionId) name:\(name) status:\(status?.description) category:\(statusCategory?.description)"
     }
 }

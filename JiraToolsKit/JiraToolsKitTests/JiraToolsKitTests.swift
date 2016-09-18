@@ -12,7 +12,7 @@ import XCTest
 class JiraToolsKitTests: XCTestCase {
     
     lazy var issueId: String = {
-        return "HGVMQA-695"
+        return "TES-1"
     }()
     
     lazy var commentBody: String = {
@@ -20,9 +20,9 @@ class JiraToolsKitTests: XCTestCase {
     }()
     
     lazy var apiClient: JTKAPIClient = {
-        let endoint  = "http://localhost:2990/jira"
-        let username = "username"
-        let password = "password"
+        let endPoint = "http://localhost:2990/jira"
+        let username = "admin"
+        let password = "admin"
 
         let client = JTKAPIClient.init(endpointUrl: endPoint, username: username, password: password)
         return client
@@ -41,7 +41,7 @@ class JiraToolsKitTests: XCTestCase {
     func testGetIssue() {
 
         // https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/testing_with_xcode/chapters/04-writing_tests.html#//apple_ref/doc/uid/TP40014132-CH4-SW6
-        let asyncExpectation = expectationWithDescription("getIssue")
+        let asyncExpectation = expectation(description: "getIssue")
 
         apiClient.getIssue(self.issueId) { (result) in
             
@@ -60,13 +60,13 @@ class JiraToolsKitTests: XCTestCase {
             asyncExpectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(30) { error in
+        self.waitForExpectations(timeout: 30) { error in
             //XCTAssertNotNil(error, "Test Never Finsihed")
         }
     }
     
     func testGetIssueFailure() {
-        let asyncExpectation = expectationWithDescription("getIssue")
+        let asyncExpectation = expectation(description: "getIssue")
         
         apiClient.getIssue("bahahaha") { (result) in
             
@@ -79,15 +79,15 @@ class JiraToolsKitTests: XCTestCase {
             asyncExpectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(30) { error in
+        self.waitForExpectations(timeout: 30) { error in
         }
     }
     
     func testGetIssueTransitions() {
         
         // https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/testing_with_xcode/chapters/04-writing_tests.html#//apple_ref/doc/uid/TP40014132-CH4-SW6
-        let asyncExpectation = expectationWithDescription("getIssue")
-        let asyncTransitionExpectation = expectationWithDescription("getIssueTransition")
+        let asyncExpectation = expectation(description: "getIssue")
+        let asyncTransitionExpectation = expectation(description: "getIssueTransition")
         
         apiClient.getIssue(self.issueId) { (result) in
             
@@ -125,7 +125,7 @@ class JiraToolsKitTests: XCTestCase {
             asyncExpectation.fulfill()
         }
         
-        self.waitForExpectationsWithTimeout(30) { error in
+        self.waitForExpectations(timeout: 30) { error in
             //XCTAssertNotNil(error, "Test Never Finsihed")
         }
     }
@@ -136,9 +136,9 @@ class JiraToolsKitTests: XCTestCase {
         
         // https://developer.apple.com/library/tvos/documentation/DeveloperTools/Conceptual/testing_with_xcode/chapters/04-writing_tests.html#//apple_ref/doc/uid/TP40014132-CH4-SW6
         
-        let asyncIssueExpectation = expectationWithDescription("getIssue")
-        let asyncTransitionExpectation = expectationWithDescription("getIssueTransition")
-        let asyncTransitionUpdateExpectation = expectationWithDescription("issueTransitionUpdate")
+        let asyncIssueExpectation = expectation(description: "getIssue")
+        let asyncTransitionExpectation = expectation(description: "getIssueTransition")
+        let asyncTransitionUpdateExpectation = expectation(description: "issueTransitionUpdate")
         
         apiClient.getIssue(self.issueId) { (result) in
             
@@ -152,7 +152,7 @@ class JiraToolsKitTests: XCTestCase {
                 XCTAssertNotNil(issue, "Issue Received from Service is Nil")
                 XCTAssertNotNil(issue.status, "Issue Status is Nil and should not be")
                 
-                XCTAssertTrue(issue.status?.name.lowercaseString == "In Progress".lowercaseString || issue.status?.name.lowercaseString == "Actioned".lowercaseString,
+                XCTAssertTrue(issue.status?.name.lowercased() == "In Progress".lowercased() || issue.status?.name.lowercased() == "Actioned".lowercased(),
                               "Issue is not In Progress or Actioned, status:\(issue.status?.description)")
 
                 self.apiClient.getIssueTransitions(issue, completion: { (transitionResult) in
@@ -197,15 +197,15 @@ class JiraToolsKitTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(90) { error in
+        self.waitForExpectations(timeout: 90) { error in
             //XCTAssertNotNil(error, "Test Never Finsihed")
         }
     }
     
     func testCommentOnIssue() {
         
-        let asyncIssueExpectation = expectationWithDescription("getIssue")
-        let asyncIssueCommentExpectation = expectationWithDescription("issueCommentExpectation")
+        let asyncIssueExpectation = expectation(description: "getIssue")
+        let asyncIssueCommentExpectation = expectation(description: "issueCommentExpectation")
         
         apiClient.getIssue(self.issueId) { (result) in
             
@@ -232,7 +232,7 @@ class JiraToolsKitTests: XCTestCase {
             }
         }
         
-        self.waitForExpectationsWithTimeout(90) { error in
+        self.waitForExpectations(timeout: 90) { error in
             //XCTAssertNotNil(error, "Test Never Finsihed")
         }
         

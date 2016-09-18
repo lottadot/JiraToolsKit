@@ -9,14 +9,13 @@
 import Foundation
 
 /// A Network Operation to Transition a Jira Issue to a different status. Can post optional comment.
-public class JTKAPIClientTransitionIssue: JTKAPIClientOperation {
+open class JTKAPIClientTransitionIssue: JTKAPIClientOperation {
 
-    
-    private var issue: JTKIssue?
-    private var transition: JTKTransition?
-    private var commentBody: String?
+    fileprivate var issue: JTKIssue?
+    fileprivate var transition: JTKTransition?
+    fileprivate var commentBody: String?
    
-    private typealias JTKAPIClientTransitionIssueComment = [ String : AnyObject]
+    fileprivate typealias JTKAPIClientTransitionIssueComment = [ String : AnyObject]
     
     convenience public init(dataProvider: JTKAPIClientOperatonDataProvider, issue: JTKIssue, transition: JTKTransition, commentBody: String?) {
         self.init(url: dataProvider.clientEndPoint())
@@ -26,20 +25,18 @@ public class JTKAPIClientTransitionIssue: JTKAPIClientOperation {
         self.commentBody = commentBody
     }
     
-    public override func start() {
-        queuePriority = .Normal
+    open override func start() {
+        queuePriority = .normal
         
-        if cancelled {
-            finished = true
+        if isCancelled {
+            isFinished = true
             return
         }
         
         // /rest/api/2/issue/{issueIdOrKey}/transitions
         guard let issueId = issue?.issueId,
             let transitionToChangeTo = self.transition,
-            //let transitionId = UInt32(transitionToChangeTo.transitionId),
-            //let serviceTransitionId:NSNumber = NSNumber.init(unsignedInt: transitionId),
-            let requestURL = NSURL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/transitions?expand=transitions.fields") else {
+            let requestURL = URL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/transitions?expand=transitions.fields") else {
             
             self.error = JTKAPIClientNetworkError.createError(1001, statusCode: 1001, failureReason: "Cannot build Request URL")
             self.cancel()
@@ -47,8 +44,8 @@ public class JTKAPIClientTransitionIssue: JTKAPIClientOperation {
             return
         }
         
-        let urlRequest = NSMutableURLRequest(URL: requestURL)
-        urlRequest.HTTPMethod = "POST"
+        let urlRequest = NSMutableURLRequest(url: requestURL)
+        urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         
@@ -58,49 +55,50 @@ public class JTKAPIClientTransitionIssue: JTKAPIClientOperation {
         let fields = Dictionary<String, AnyObject>()
         
         if let body = self.commentBody {
-            let comment:JTKAPIClientTransitionIssueComment = [ "body" : body ]
-            let add:[ String: AnyObject] = [ "add" : comment ]
+            let comment:JTKAPIClientTransitionIssueComment = [ "body" : body as AnyObject ]
+            let add:[ String: AnyObject] = [ "add" : comment as AnyObject ]
             comments.append(add)
         }
         
         if comments.count > 0 {
-            updates["comment"] = comments
+            updates["comment"] = comments as AnyObject?
         }
         
         if updates.keys.count > 0 {
-            uploadDictionary["update"] = updates
+            uploadDictionary["update"] = updates as AnyObject?
         }
         
         //fields["resolution"] = [ "name" : "Ready For QA"]
         //fields["assignee"] = [ "name" : "" ]
         
         if fields.keys.count > 0 {
-            uploadDictionary["fields"] = fields
+            uploadDictionary["fields"] = fields as AnyObject?
         }
         
-        uploadDictionary["transition"] = [ "id" : transitionToChangeTo.transitionId ]
+        let transitionDict:[String : AnyObject] = [ "id" : transitionToChangeTo.transitionId as AnyObject ]
+        uploadDictionary["transition"] = transitionDict as AnyObject?
         // po print(uploadDictionary)
         
-        var uploadData: NSData
+        var uploadData: Data
         
         do {
-            uploadData = try NSJSONSerialization.dataWithJSONObject(uploadDictionary, options: [])
+            uploadData = try JSONSerialization.data(withJSONObject: uploadDictionary, options: [])
         } catch let error as NSError {
             self.error = error
-            finished = true
+            isFinished = true
             return
         }
         
-        let task = urlSession.uploadTaskWithRequest(urlRequest, fromData: uploadData)
+        let task = urlSession.uploadTask(with: urlRequest as URLRequest, from: uploadData)
         task.resume()
     }
     
     override func handleResponse() {
-        if cancelled {
+        if isCancelled {
             return
         }
         
-        finished = true
+        isFinished = true
         return
     }
 }

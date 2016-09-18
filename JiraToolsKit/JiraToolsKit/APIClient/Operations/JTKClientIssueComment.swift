@@ -9,15 +9,15 @@
 import Foundation
 
 /// A Network Operation to post a comment to a JIRA Issue.
-public class JTKClientIssueComment: JTKAPIClientOperation {
+open class JTKClientIssueComment: JTKAPIClientOperation {
     
     /// The Issue to Post to.
-    private var issue: JTKIssue?
+    fileprivate var issue: JTKIssue?
     
     /// The Comment Text to Post.
-    private var commentBody: String!
+    fileprivate var commentBody: String!
     
-    private typealias JTKAPIClientTransitionIssueComment = [ String : AnyObject]
+    fileprivate typealias JTKAPIClientTransitionIssueComment = [ String : AnyObject]
     
     convenience public init(dataProvider: JTKAPIClientOperatonDataProvider, issue: JTKIssue, commentBody: String?) {
         self.init(url: dataProvider.clientEndPoint())
@@ -26,17 +26,17 @@ public class JTKClientIssueComment: JTKAPIClientOperation {
         self.commentBody = commentBody
     }
     
-    public override func start() {
-        queuePriority = .Normal
+    open override func start() {
+        queuePriority = .normal
         
-        if cancelled {
-            finished = true
+        if isCancelled {
+            isFinished = true
             return
         }
         
         // /rest/api/2/issue/{issueIdOrKey}/transitions
         guard let issueId = issue?.issueId,
-            let requestURL = NSURL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/comment") else {
+            let requestURL = URL.init(string: self.endpointURL.absoluteString + "/rest/api/2/issue/" + issueId + "/comment") else {
                 
                 self.error = JTKAPIClientNetworkError.createError(1001, statusCode: 1001, failureReason: "Cannot build Request URL")
                 self.cancel()
@@ -44,34 +44,34 @@ public class JTKClientIssueComment: JTKAPIClientOperation {
                 return
         }
         
-        let urlRequest = NSMutableURLRequest(URL: requestURL)
-        urlRequest.HTTPMethod = "POST"
+        let urlRequest = NSMutableURLRequest(url: requestURL)
+        urlRequest.httpMethod = "POST"
         urlRequest.addValue("application/json", forHTTPHeaderField: "Content-Type")
         urlRequest.addValue("application/json", forHTTPHeaderField: "Accept")
         
         var uploadDictionary = Dictionary<String, AnyObject>()
-        uploadDictionary["body"] = self.commentBody
+        uploadDictionary["body"] = self.commentBody as AnyObject?
 
-        var uploadData: NSData
+        var uploadData: Data
         
         do {
-            uploadData = try NSJSONSerialization.dataWithJSONObject(uploadDictionary, options: [])
+            uploadData = try JSONSerialization.data(withJSONObject: uploadDictionary, options: [])
         } catch let error as NSError {
             self.error = error
-            finished = true
+            isFinished = true
             return
         }
         
-        let task = urlSession.uploadTaskWithRequest(urlRequest, fromData: uploadData)
+        let task = urlSession.uploadTask(with: urlRequest as URLRequest, from: uploadData)
         task.resume()
     }
     
     override func handleResponse() {
-        if cancelled {
+        if isCancelled {
             return
         }
         
-        finished = true
+        isFinished = true
         return
     }
 }

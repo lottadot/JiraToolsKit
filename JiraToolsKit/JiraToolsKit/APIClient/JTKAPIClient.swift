@@ -19,20 +19,20 @@ public struct JTKAPIClientResult {
 public protocol JTKAPIClientOperatonDataProvider {
     func clientUsername() -> String
     func clientPassword() -> String
-    func clientEndPoint() -> NSURL
+    func clientEndPoint() -> URL
 }
 
 /// The Jira Tools API Client
-public class JTKAPIClient {
+open class JTKAPIClient {
     
-    private var endpointURL: NSURL!
-    private var queue: NSOperationQueue!
-    private var username: String!
-    private var password: String!
+    fileprivate var endpointURL: URL!
+    fileprivate var queue: OperationQueue!
+    fileprivate var username: String!
+    fileprivate var password: String!
     
     public init(endpointUrl: String, username: String, password: String) {
 
-        guard let url = NSURL.init(string: endpointUrl) else {
+        guard let url = URL.init(string: endpointUrl) else {
             fatalError()
         }
         
@@ -40,12 +40,12 @@ public class JTKAPIClient {
         self.username = username
         self.password = password
         
-        self.queue = NSOperationQueue.init()
+        self.queue = OperationQueue.init()
         self.queue.maxConcurrentOperationCount = 1
     }
     
     /// Get a Jira Issue.
-    public func getIssue(issueIdOrKey: String, completion: (result: JTKAPIClientResult) -> ()) {
+    open func getIssue(_ issueIdOrKey: String, completion: @escaping (_ result: JTKAPIClientResult) -> ()) {
         // /rest/api/2/issue/{issueIdOrKey}
 
         // http://localhost:2990/jira/rest/api/2/issue/TP1-1
@@ -57,19 +57,19 @@ public class JTKAPIClient {
                 return
             }
             
-            if strongOp.cancelled {
+            if strongOp.isCancelled {
                 return
             }
             
             let apiResult = JTKAPIClientResult(success: nil != strongOp.issue, error: strongOp.error, data: strongOp.issue)
-            completion(result: apiResult)
+            completion(apiResult)
         }
         
         queue.addOperation(op)
     }
     
     /// Get a Jira Issue's Transitions
-    public func getIssueTransitions(issue: JTKIssue, completion: (result: JTKAPIClientResult) -> ()) {
+    open func getIssueTransitions(_ issue: JTKIssue, completion: @escaping (_ result: JTKAPIClientResult) -> ()) {
         // /rest/api/2/issue/{issueIdOrKey}/transitions
 
         // http://localhost:2990/jira/rest/api/2/issue/TP1-1/transitions
@@ -81,19 +81,19 @@ public class JTKAPIClient {
                 return
             }
             
-            if strongOp.cancelled {
+            if strongOp.isCancelled {
                 return
             }
             
-            let apiResult = JTKAPIClientResult(success: (nil == strongOp.error), error: strongOp.error, data: strongOp.transitions)
-            completion(result: apiResult)
+            let apiResult = JTKAPIClientResult(success: (nil == strongOp.error), error: strongOp.error, data: strongOp.transitions as AnyObject?)
+            completion(apiResult)
         }
         
         queue.addOperation(op)
     }
     
     /// Update a Jira Issue by applying a `JTKTransition` Transition. Can post an optional comment.
-    public func transitionIssue(issue: JTKIssue, transition: JTKTransition, comment: String?, completion: (result: JTKAPIClientResult) -> ()) {
+    open func transitionIssue(_ issue: JTKIssue, transition: JTKTransition, comment: String?, completion: @escaping (_ result: JTKAPIClientResult) -> ()) {
         
         let op = JTKAPIClientTransitionIssue(dataProvider: self, issue: issue, transition: transition, commentBody: comment)
         op.completionBlock = {
@@ -102,19 +102,19 @@ public class JTKAPIClient {
                 return
             }
             
-            if strongOp.cancelled {
+            if strongOp.isCancelled {
                 return
             }
             
             let apiResult = JTKAPIClientResult(success: nil == strongOp.error, error: strongOp.error, data: nil)
-            completion(result: apiResult)
+            completion(apiResult)
         }
         
         queue.addOperation(op)
     }
     
     /// Update a Jira Issue by posting a comment.
-    public func commentOnIssue(issue: JTKIssue, comment: String?, completion: (result: JTKAPIClientResult) -> ()) {
+    open func commentOnIssue(_ issue: JTKIssue, comment: String?, completion: @escaping (_ result: JTKAPIClientResult) -> ()) {
         
         let op = JTKClientIssueComment(dataProvider: self, issue: issue, commentBody: comment)
         op.completionBlock = {
@@ -123,12 +123,12 @@ public class JTKAPIClient {
                 return
             }
             
-            if strongOp.cancelled {
+            if strongOp.isCancelled {
                 return
             }
             
             let apiResult = JTKAPIClientResult(success: nil == strongOp.error, error: strongOp.error, data: nil)
-            completion(result: apiResult)
+            completion(apiResult)
         }
         
         queue.addOperation(op)
@@ -147,7 +147,7 @@ extension JTKAPIClient: JTKAPIClientOperatonDataProvider {
         return self.password
     }
     
-    public func clientEndPoint() -> NSURL {
+    public func clientEndPoint() -> URL {
         return self.endpointURL
     }
 }

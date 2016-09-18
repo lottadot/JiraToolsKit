@@ -9,44 +9,44 @@
 import Foundation
 
 /// This is a base `NSOpertaion` class. All "Network Opertions" should inherit from this class.
-public class JTKAPIClientOperation: NSOperation, NSURLSessionDataDelegate {
+open class JTKAPIClientOperation: Operation, URLSessionDataDelegate {
     
     var receivedData = NSMutableData()
     var error: NSError?
     
-    let endpointURL: NSURL
+    let endpointURL: URL
     var dataProvider: JTKAPIClientOperatonDataProvider?
     
-    private var swiftKVOFinished = false
+    fileprivate var swiftKVOFinished = false
     
-    var urlSession: NSURLSession {
-        let configuration = NSURLSessionConfiguration.defaultSessionConfiguration()
+    var urlSession: Foundation.URLSession {
+        let configuration = URLSessionConfiguration.default
         configuration.timeoutIntervalForRequest = 30
         
         if let provider = self.dataProvider {
             // https://www.base64encode.org/
             let userPasswordString = "\(provider.clientUsername()):\(provider.clientPassword())"
-            let userPasswordData = userPasswordString.dataUsingEncoding(NSASCIIStringEncoding)
-            let base64EncodedCredential = userPasswordData!.base64EncodedStringWithOptions(NSDataBase64EncodingOptions(rawValue:0))
+            let userPasswordData = userPasswordString.data(using: String.Encoding.ascii)
+            let base64EncodedCredential = userPasswordData!.base64EncodedString(options: NSData.Base64EncodingOptions(rawValue:0))
             let authString = "Basic \(base64EncodedCredential)"
-            configuration.HTTPAdditionalHeaders = ["Authorization" : authString]
+            configuration.httpAdditionalHeaders = ["Authorization" : authString]
         }
         
-        return NSURLSession(configuration: configuration, delegate: self, delegateQueue: nil)
+        return Foundation.URLSession(configuration: configuration, delegate: self, delegateQueue: nil)
     }
     
-    public override var asynchronous: Bool {
+    open override var isAsynchronous: Bool {
         return false
     }
     
-    public override var finished: Bool {
+    open override var isFinished: Bool {
         get {
             return swiftKVOFinished
         }
         set {
-            self.willChangeValueForKey("isFinished")
+            self.willChangeValue(forKey: "isFinished")
             swiftKVOFinished = newValue
-            self.didChangeValueForKey("isFinished")
+            self.didChangeValue(forKey: "isFinished")
         }
     }
     
@@ -56,7 +56,7 @@ public class JTKAPIClientOperation: NSOperation, NSURLSessionDataDelegate {
     //        super.init()
     //    }
     
-    public init(url: NSURL) {
+    public init(url: URL) {
         self.endpointURL = url
         //self.operationResult = result
         super.init()
@@ -67,65 +67,65 @@ public class JTKAPIClientOperation: NSOperation, NSURLSessionDataDelegate {
     }
     
     // MARK: NSURLSessionDataDelegate
-    public func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveResponse response: NSURLResponse, completionHandler: (NSURLSessionResponseDisposition) -> Void) {
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive response: URLResponse, completionHandler: @escaping (URLSession.ResponseDisposition) -> Void) {
         
-        if cancelled {
-            finished = true
+        if isCancelled {
+            isFinished = true
             dataTask.cancel()
             return
         }
         
-        guard let httpResponse = response as? NSHTTPURLResponse else {
+        guard let httpResponse = response as? HTTPURLResponse else {
             fatalError("Did not receive NSHTTPURLResponse")
         }
         
         if isSuccessfulHTTPStatusCode(httpResponse.statusCode) {
-            completionHandler(.Allow)
+            completionHandler(.allow)
         } else {
-            self.error = JTKAPIClientNetworkError.createError(JTKAPIClientNetworkError.Code.HttpError.rawValue, statusCode: httpResponse.statusCode, failureReason: "HTTP Status Invalid")
-            completionHandler(.Cancel)
+            self.error = JTKAPIClientNetworkError.createError(JTKAPIClientNetworkError.Code.httpError.rawValue, statusCode: httpResponse.statusCode, failureReason: "HTTP Status Invalid")
+            completionHandler(.cancel)
         }
     }
     
-    private func isSuccessfulHTTPStatusCode(code: Int) -> Bool {
+    fileprivate func isSuccessfulHTTPStatusCode(_ code: Int) -> Bool {
         return (code >= 200 && code < 300)
     }
     
-    public func URLSession(session: NSURLSession, dataTask: NSURLSessionDataTask, didReceiveData data: NSData) {
-        if cancelled {
-            finished = true
+    open func urlSession(_ session: URLSession, dataTask: URLSessionDataTask, didReceive data: Data) {
+        if isCancelled {
+            isFinished = true
             dataTask.cancel()
             return
         }
         
-        receivedData.appendData(data)
+        receivedData.append(data)
     }
     
-    public func URLSession(session: NSURLSession, task: NSURLSessionTask, didCompleteWithError error: NSError?) {
-        if cancelled {
+    open func urlSession(_ session: URLSession, task: URLSessionTask, didCompleteWithError error: Error?) {
+        if isCancelled {
             self.receivedData = NSMutableData()
-            finished = true
+            isFinished = true
             task.cancel()
             return
         }
         
-        if let httpError = self.error where httpError.domain == JTKAPIClientNetworkError.ErrorDomain
-                && httpError.code == JTKAPIClientNetworkError.Code.HttpError.rawValue {
+        if let httpError = self.error , httpError.domain == JTKAPIClientNetworkError.ErrorDomain
+                && httpError.code == JTKAPIClientNetworkError.Code.httpError.rawValue {
             self.receivedData = NSMutableData()
-            finished = true
+            isFinished = true
             task.cancel()
             return
         }
         
         if error != nil {
-            self.error = error
-            finished = true
+            self.error = error as NSError?
+            isFinished = true
             return
         }
         
         handleResponse()
         
-        finished = true
+        isFinished = true
     }
 }
 

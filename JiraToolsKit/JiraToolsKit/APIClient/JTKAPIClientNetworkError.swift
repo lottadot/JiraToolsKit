@@ -16,11 +16,11 @@ public struct JTKAPIClientNetworkError {
     static let HttpStatusCode = "HttpStatusCode"
     
     enum Code: Int {
-        case HttpError = -4000
+        case httpError = -4000
     }
     
-    public static func createError(code: Int, statusCode: Int, failureReason: String) -> NSError {
-        let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason, HttpStatusCode: statusCode] as [String: AnyObject]
+    public static func createError(_ code: Int, statusCode: Int, failureReason: String) -> NSError {
+        let userInfo = [NSLocalizedFailureReasonErrorKey: failureReason as AnyObject, HttpStatusCode: statusCode as AnyObject] as [String: AnyObject]
         return NSError(domain: ErrorDomain, code: code, userInfo: userInfo)
     }
 }

@@ -9,7 +9,7 @@
 import Foundation
 
 /// The `JTKIssue` class represents a JIRA API Issue.
-public class JTKIssue {
+open class JTKIssue {
     
     var issueId: String?        // "10002"
     var url: String             // "http://www.example.com/jira/rest/api/2/issue/10002"
@@ -30,7 +30,7 @@ public class JTKIssue {
         self.status = status
     }
     
-    public static func withDictionary(dictionary: [String : AnyObject]) -> JTKIssue? {
+    open static func withDictionary(_ dictionary: [String : AnyObject]) -> JTKIssue? {
     
         guard let fakeId = dictionary["id"] as? String,
             let fakeUrl = dictionary["self"] as? String,
@@ -62,11 +62,11 @@ public class JTKIssue {
         return aIssue
     }
     
-    public var description:String {
+    open var description:String {
         return "Issue id:\(issueId) url:\(url) key:\(key) status:\(status?.name)"
     }
     
-    public var debugDescription:String {
+    open var debugDescription:String {
         return "Issue id:\(issueId) url:\(url) key:\(key) status:\(status?.description)"
     }
 }

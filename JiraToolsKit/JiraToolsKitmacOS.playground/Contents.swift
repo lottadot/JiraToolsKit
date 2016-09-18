@@ -2,9 +2,8 @@
 
 import Cocoa
 import JiraToolsKit
-import XCPlayground
 
-XCPlaygroundPage.currentPage.needsIndefiniteExecution = true
+PlaygroundPage.current.needsIndefiniteExecution = true
 
 var str = "Hello, playground"
 
@@ -41,12 +40,11 @@ api.getIssue(issueId) { (result) in
                     print("transitions failed")
                     
                 }
-                XCPlaygroundPage.currentPage.finishExecution()
+                PlaygroundPage.current.finishExecutioon()
+                
             })
         } else {
-            XCPlaygroundPage.currentPage.finishExecution()
+            PlaygroundPage.current.finishExecutioon()
         }
     }
 }
-
-//XCPlaygroundPage.currentPage.needsIndefiniteExecution = true
