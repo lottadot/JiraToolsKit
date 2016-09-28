@@ -2,22 +2,22 @@
 
 import Cocoa
 import JiraToolsKit
+import PlaygroundSupport
 
 PlaygroundPage.current.needsIndefiniteExecution = true
 
-var str = "Hello, playground"
-
 let endPoint = "http://localhost:2990/jira"
-let username = ""
-let password = ""
-let issueId = "MOBAPITEST-1"
+let username = "admin"
+let password = "admin"
+let issueId = "TES-1"
 
 var issue:JTKIssue? = nil
 
 let api = JTKAPIClient.init(endpointUrl: endPoint, username: username, password: password)
 
+print("getting issue")
 api.getIssue(issueId) { (result) in
-    
+    print("got issue or something")
     if let error = result.error {
         print("Failure: \(error.localizedDescription)")
     } else {
@@ -40,11 +40,11 @@ api.getIssue(issueId) { (result) in
                     print("transitions failed")
                     
                 }
-                PlaygroundPage.current.finishExecutioon()
+                PlaygroundPage.current.finishExecution()
                 
             })
         } else {
-            PlaygroundPage.current.finishExecutioon()
+            PlaygroundPage.current.finishExecution()
         }
     }
 }
